@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            width: 400px;
+            height: 500px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-title {
+            text-align: center;
+            padding: 10px;
+            background-color: #007BFF;
+            font-size: 30px;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #chatbox {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .user-message {
+            background-color: #b4d9f7;
+            color: #000;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            text-align: end;
+        }
+
+        #messageForm {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            background-color: #f2f2f2;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 5px;
+        }
+
+        #fileInput {
+            margin-left: 10px;
+        }
+
+        .typing-indicator {
+            text-align: end;
+        }
+
+        .typing-indicator::after {
+            content: '...';
+            animation: typing 1s infinite;
+        }
+
+        @keyframes typing {
+
+            0%,
+            100% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-title">Welcome to Astoria AI</div>
+        <div id="chatbox"></div>
+        <form id="messageForm">
+            <input type="text" name="message" id="messageInput" placeholder="Type your message here" />
+            <input type="file" name="file" id="fileInput" />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('http://localhost:5200'); // Replace with your server URL
+
+        // Function to show typing animation
+        function showTypingIndicator() {
+            const chatbox = document.getElementById('chatbox');
+            const typingIndicator = document.createElement('p');
+            typingIndicator.innerText = 'Astoria AI is typing';
+            typingIndicator.classList.add('typing-indicator');
+            chatbox.appendChild(typingIndicator);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        // Function to hide typing animation
+        function hideTypingIndicator() {
+            const chatbox = document.getElementById('chatbox');
+            const typingIndicator = chatbox.querySelector('.typing-indicator');
+            if (typingIndicator) {
+                chatbox.removeChild(typingIndicator);
+            }
+        }
+
+        document.getElementById('messageForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (message === '' && !file) {
+                return; // If both message and file are empty, prevent the form submission
+            }
+
+            const chatbox = document.getElementById('chatbox');
+
+            // Create a new paragraph element for the user message (if the message is not empty)
+            if (message !== '') {
+                const userMsg = document.createElement('p');
+                userMsg.innerText = message;
+                userMsg.classList.add('user-message');
+                chatbox.appendChild(userMsg);
+            }
+
+            // Scroll to the bottom of the chatbox after adding user message (if the message is not empty)
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const base64File = reader.result.split(',')[1]; // Extract the base64 content
+                    socket.emit('clientMessage', { message: message, file: base64File });
+                };
+                reader.readAsDataURL(file);
+            } else {
+                socket.emit('clientMessage', { message: message }); // Emit user message to server (if the message is not empty)
+            }
+
+            // Show typing animation
+            showTypingIndicator();
+
+            messageInput.value = '';
+        });
+
+        socket.on('serverMessage', (serverResp) => {
+            console.log('Server Response:', serverResp);
+            const chatbox = document.getElementById('chatbox');
+            // Hide typing animation
+            hideTypingIndicator();
+
+            const p = document.createElement('p');
+            p.innerText = serverResp;
+            chatbox.appendChild(p);
+
+            // Scroll to the bottom of the chatbox after adding a new message
+            chatbox.scrollTop = chatbox.scrollHeight;
+        });
+
+    </script>
+</body>
+
+</html>

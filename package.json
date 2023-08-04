@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "@nlpjs/console-connector": "^4.26.1",
+    "any-text": "^1.2.0",
+    "axios": "^1.4.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "docxtemplater": "^3.37.12",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "file-type": "^18.5.0",
+    "file-type-stream": "^1.0.0",
+    "fs": "^0.0.1-security",
+    "joi": "^17.9.2",
+    "jsonwebtoken": "^9.0.1",
+    "md5": "^2.3.0",
+    "mime-types": "^2.1.35",
+    "mongoose": "^7.4.1",
+    "mongose": "^0.0.2-security",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.4",
+    "nodemon": "^3.0.1",
+    "pdf-parse": "^1.1.1",
+    "socket.io": "^4.7.1",
+    "socket.io-client": "^4.7.1",
+    "socket.io-file": "^2.0.31"
+  }
+}
