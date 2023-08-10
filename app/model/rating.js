@@ -8,6 +8,9 @@ const chatbotSchema = Schema({
     rating: {
         type: String,
     },
+    feedback_message: {
+        type: String,
+    },
 },
     {
         timestamps: true

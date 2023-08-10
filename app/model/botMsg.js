@@ -5,10 +5,10 @@ const botMsgSchema = Schema({
     uid: {
         type: String,
     },
-    first_name: {
+    full_name: {
         type: String,
     },
-    last_name: {
+    visa: {
         type: String,
     },
     email: {

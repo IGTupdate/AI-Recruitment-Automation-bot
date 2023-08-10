@@ -4,8 +4,8 @@ const responseMsg = require("../utils/responseMsg");
 
 exports.create = async (req, res) => {
     try {
-        const { rating } = req.body;
-        const data = { user_id: req.user._id, rating }
+        const { rating, feedback_message } = req.body;
+        const data = { user_id: req.user._id, rating, feedback_message }
         const newRating = new Ratings(data)
         await newRating.save()
         handleResponse(res, responseMsg.Rating, 201)

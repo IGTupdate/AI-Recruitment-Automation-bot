@@ -12,6 +12,7 @@ const db = {
     User: require('./user'),
     BotMsgs: require('./botMsg'),
     Ratings: require('./rating'),
+    Questions: require('./question'),
 
 }
 
