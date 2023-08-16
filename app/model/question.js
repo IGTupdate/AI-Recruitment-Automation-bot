@@ -2,12 +2,10 @@ const mongoose = require("mongoose")
 const { Schema } = mongoose
 
 const questionSchema = Schema({
-    user_id: {
-        type: String,
-    },
-
+    user_id: String,
     question: String,
-    options: [String],
+    answer: String,
+    questionId: String
 },
     {
         timestamps: true

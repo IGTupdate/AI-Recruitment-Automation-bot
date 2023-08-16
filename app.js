@@ -4,6 +4,8 @@ const app = express()
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
+const FormData = require('form-data');
+
 
 const socket = require('socket.io');
 const path = require("path")
@@ -76,20 +78,10 @@ const { botReply } = require('./app/controller/botMsg');
 io.on("connection", function (socket) {
     const uid = createUUID()
 
-    const obj = {
-        data: {
-            uid: uid,
-            first_name: '',
-            last_name: '',
-            email: '',
-            purpose: '',
-
-            professions: '',
-            status: '',
-            positions: ''
-        },
-
-        count: 0
+    const client = {
+        uid: uid,
+        count: 0,
+        getData: []
     }
 
     const intro = `Greetings! I am your friendly AI agent from Astoria AI, here to assist you in any way possible. As a cutting-edge artificial intelligence, I have been meticulously crafted by the brilliant minds at Astoria AI to provide you with seamless and intuitive interactions. Equipped with the latest advancements in natural language processing and machine learning, I am designed to comprehend human language and deliver relevant and accurate responses.`
@@ -97,11 +89,42 @@ io.on("connection", function (socket) {
     socket.emit('serverMessage', intro)
 
     socket.on('clientMessage', async (data) => {
-        let serverResp = await botReply(data, obj)
-        messages.push(serverResp && serverResp);
 
-        setTimeout(() => {
-            socket.emit('serverMessage', serverResp,)
-        }, 1000)
+        processFormData(data);
+
+        console.log('data>>>>>>>', data);
+        // if (data && data.file) {
+        //     const formData = new FormData();
+        //     const pdfBuffer = data.file;
+
+        //     const buffer = Buffer.from(pdfBuffer, 'hex');
+
+        //     formData.append('pdf', buffer, {
+        //         filename: 'my_document.pdf', // Set the desired filename for the PDF file
+        //         contentType: 'application/pdf' // Set the appropriate content type for PDF
+        //     });
+        //     const x = formData
+        //     let serverResp = await botReply(data, client, x)
+
+        //     setTimeout(() => {
+        //         socket.emit('serverMessage', serverResp,)
+        //     }, 1000)
+
+        // }
+        // else {
+        //     let serverResp = await botReply(data, client,)
+        //     messages.push(serverResp && serverResp);
+        //     setTimeout(() => {
+        //         socket.emit('serverMessage', serverResp,)
+        //     }, 1000)
+        // }
+
     });
+    const processFormData = (formData) => {
+
+
+        console.log('ggggggggggggggggggggggg', formData);
+
+    }
+
 });
