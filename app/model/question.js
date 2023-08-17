@@ -5,6 +5,7 @@ const questionSchema = Schema({
     user_id: String,
     question: String,
     answer: String,
+    selectedAnser: String,
     questionId: String
 },
     {

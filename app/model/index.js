@@ -9,11 +9,13 @@ mongoose.connect(`${process.env.MONGO_DB_URI}`, {
 
 
 const db = {
+
     User: require('./user'),
     BotMsgs: require('./botMsg'),
     Ratings: require('./rating'),
     Questions: require('./question'),
 
+    CVQuestions: require('./cvQuestion'),
 }
 
 

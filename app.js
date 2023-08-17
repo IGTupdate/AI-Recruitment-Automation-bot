@@ -3,14 +3,8 @@ const app = express()
 
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
-const FormData = require('form-data');
-
-
 const socket = require('socket.io');
-const path = require("path")
-const multer = require('multer');
-const upload = multer({ dest: 'upload/' });
+const path = require("path");
 
 
 require("dotenv").config({ path: __dirname + '/.env' });
@@ -85,46 +79,23 @@ io.on("connection", function (socket) {
     }
 
     const intro = `Greetings! I am your friendly AI agent from Astoria AI, here to assist you in any way possible. As a cutting-edge artificial intelligence, I have been meticulously crafted by the brilliant minds at Astoria AI to provide you with seamless and intuitive interactions. Equipped with the latest advancements in natural language processing and machine learning, I am designed to comprehend human language and deliver relevant and accurate responses.`
-
     socket.emit('serverMessage', intro)
 
     socket.on('clientMessage', async (data) => {
+        let serverResp = '';
 
-        processFormData(data);
+        if (data?.file) {
+            const blob = new Blob([data.file], { type: 'application/pdf' });
+            serverResp = await botReply(data, client, blob)
+            messages.push(serverResp && serverResp);
+        }
+        else {
+            serverResp = await botReply(data, client)
+            messages.push(serverResp && serverResp);
+        };
 
-        console.log('data>>>>>>>', data);
-        // if (data && data.file) {
-        //     const formData = new FormData();
-        //     const pdfBuffer = data.file;
-
-        //     const buffer = Buffer.from(pdfBuffer, 'hex');
-
-        //     formData.append('pdf', buffer, {
-        //         filename: 'my_document.pdf', // Set the desired filename for the PDF file
-        //         contentType: 'application/pdf' // Set the appropriate content type for PDF
-        //     });
-        //     const x = formData
-        //     let serverResp = await botReply(data, client, x)
-
-        //     setTimeout(() => {
-        //         socket.emit('serverMessage', serverResp,)
-        //     }, 1000)
-
-        // }
-        // else {
-        //     let serverResp = await botReply(data, client,)
-        //     messages.push(serverResp && serverResp);
-        //     setTimeout(() => {
-        //         socket.emit('serverMessage', serverResp,)
-        //     }, 1000)
-        // }
-
+        setTimeout(() => {
+            socket.emit('serverMessage', serverResp,)
+        }, 1000)
     });
-    const processFormData = (formData) => {
-
-
-        console.log('ggggggggggggggggggggggg', formData);
-
-    }
-
 });
