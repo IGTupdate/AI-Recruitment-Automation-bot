@@ -67,7 +67,7 @@ const io = socket(server, {
     },
 });
 
-const { botReply } = require('./app/controller/botMsg');
+const { botReply, calculatResult } = require('./app/controller/botMsg');
 
 io.on("connection", function (socket) {
     const uid = createUUID()
@@ -98,4 +98,9 @@ io.on("connection", function (socket) {
             socket.emit('serverMessage', serverResp,)
         }, 1000)
     });
+
+    socket.on('clientmcq', async (data) => {
+        let serverResult = await calculatResult(data)
+        socket.emit('serverresult', serverResult,)
+    })
 });

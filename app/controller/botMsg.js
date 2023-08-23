@@ -1,7 +1,6 @@
 const axios = require("axios");
 const { BotMsgs, Questions, CVQuestions } = require("../model");
 
-
 exports.botMsg = async (req, res) => {
     const botmsg = BotMsgs.find();
 };
@@ -52,13 +51,12 @@ exports.botReply = async (message, client, blob) => {
     };
 
     if (client.getData.length > 0) {
-
-        if (message['id'] === 1 && client.count === 1) {
+        if (client.count === 1) {
             if (message.message.match(mailformat)) {
                 message = message;
             }
             else {
-                client.count = 0
+                client.count = 1
                 return 'Please Enter vailid email and email is require!';
             }
         }
@@ -77,7 +75,6 @@ exports.botReply = async (message, client, blob) => {
             })
         })
 
-
         await Questions.insertMany(dataArray)
     }
 
@@ -89,7 +86,7 @@ exports.botReply = async (message, client, blob) => {
 
             const question = await Questions.findOne({ user_id: client?.uid, questionId: 4 })
 
-            const result = await axios.post(`https://www.jowry.click/generate-questions?role=${question.answer}&question_count=5`, formData, {
+            const result = await axios.post(`https://www.jowry.click/generate-questions?role=${question.answer}&question_count=10`, formData, {
                 headers: {
                     'accept': 'application/json',
                     'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
@@ -117,3 +114,56 @@ exports.botReply = async (message, client, blob) => {
     return questions[client.count++]
 };
 
+exports.calculatResult = async (arg) => {
+    try {
+        const data = [];
+
+        for (const item of arg) {
+            const op = item.answer.charAt(0).toLowerCase();
+            const v = await CVQuestions.findOne({ _id: item.id, correct_choice: op });
+            data.push(v === null ? 0 : 1);
+        }
+
+        const correctAnswers = data.reduce((accumulator, currentValue) => {
+            return accumulator + currentValue;
+        }, 0);
+
+        const totalQuestions = data.length;
+        const percentageCorrect = (correctAnswers / totalQuestions) * 100;
+
+        let grade = {};
+
+        if (percentageCorrect >= 90) {
+            grade = {
+                grade: 'A',
+                message: 'Excellent! You scored an A.'
+            };
+        } else if (percentageCorrect >= 80) {
+            grade = {
+                grade: 'B',
+                message: 'Great job! You scored a B.'
+            };
+        } else if (percentageCorrect >= 70) {
+            grade = {
+                grade: 'C',
+                message: 'Good work! You scored a C.'
+            };
+        } else if (percentageCorrect >= 60) {
+            grade = {
+                grade: 'D',
+                message: 'You passed with a D.'
+            };
+        } else {
+            grade = {
+                grade: 'F',
+                message: 'Unfortunately, you did not pass. Keep practicing.'
+            };
+        }
+
+        return grade;
+    }
+    catch (error) {
+        console.error('Error:', error);
+        throw error; // Re-throw the error to be handled by the caller if needed
+    }
+};
